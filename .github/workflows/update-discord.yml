@@ -1,7 +1,7 @@
 name: Update Discord Data
 on:
   schedule:
-    - cron: '*/5 * * * *'  # Every 5 minutes
+    - cron: '* * * * *'  # Every minute (GitHub Actions minimum)
   workflow_dispatch:
 
 jobs:
@@ -9,17 +9,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/setup-node@v3
         with:
           node-version: '18'
       - run: npm install
-      - run: timeout 30s node bot.js || true
+      - name: Run bot and update data
+        run: |
+          node bot.js &
+          BOT_PID=$!
+          sleep 60
+          kill $BOT_PID || true
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           GUILD_ID: ${{ secrets.GUILD_ID }}
-      - run: |
+      - name: Commit and push changes
+        run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add public/users.json
-          git commit -m "Update Discord data" || exit 0
-          git push
+          git add .
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update Discord data $(date)"
+            git push
