@@ -1,0 +1,22 @@
+{
+  "name": "pupil-bot-website",
+  "version": "1.0.0",
+  "description": "Discord bot that updates users.json for website",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "concurrently \"node bot.js\" \"node server.js\"",
+    "build": "echo 'No build step required'"
+  },
+  "dependencies": {
+    "discord.js": "^14.11.0",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
+  "engines": {
+    "node": ">=16"
+  }
+}
